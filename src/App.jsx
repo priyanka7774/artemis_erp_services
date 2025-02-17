@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 // import LoginPage from './components/LoginPage';
 import AuthPage from './Components/AuthPage';
 import Vision from './Components/vision';
+import Dashboard from './Components/Dashboard';
 
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
@@ -33,6 +34,7 @@ function App() {
             {/* <Route path="/login" element={<LoginPage />} /> */}
             <Route path="/AuthPage" element={<AuthPage />} />
             <Route path="/Vision" element={<Vision />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </div>
       </div>  
