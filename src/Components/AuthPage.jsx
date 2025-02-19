@@ -16,11 +16,16 @@ const RegistrationPage = () => {
 
   const [emailForReset, setEmailForReset] = useState('');
 
+  // const [loginData, setLoginData] = useState({
+  //   username: '',
+  //   password: ''
+  // });
+
   const [loginData, setLoginData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
-
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -67,114 +72,10 @@ const RegistrationPage = () => {
 
   
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (forgotPassword) {
-  //     console.log("Resetting password for", emailForReset);
-  //     alert("Password reset link has been sent to your email.");
-  //     // Handle reset password logic here
-  //   } else if (isLogin) {
-  //     console.log("Logging in with", loginData);
-  //     alert("Login successful!");
-  //     // Handle login logic here
-  //   } else {
-  //     console.log("Registering with", formData);
-  //     alert("Registration successful!");
-      
-  //     // After registration, switch to the login form
-  //     setIsLogin(true);
 
-  //     // Optionally, reset the formData
-  //     setFormData({
-  //       username: '',
-  //       email: '',
-  //       phoneNumber: '',
-  //       designation: '',
-  //       dob: '',
-  //       dateOfJoining: '',
-  //       password: '',
-  //       confirmPassword: ''
-  //     });
-  //   }
-  // };
-
-
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  
-  //   try {
-  //     if (forgotPassword) {
-  //       const response = await axios.post('/api/reset-password', { email: emailForReset });
-  //       alert(response.data.message);
-  //     } else if (isLogin) {
-  //       // await axios.post('http://localhost:3000/api/login', loginData);
-
-  //       // alert(response.data.message);
-  //       const response = await axios.post('http://localhost:3000/api/login', loginData);
-  //       alert(response.data.message); // Accessing response.data.message
-  //     } else {
-  //       const response = await axios.post('http://localhost:5000/api/register', formData);
-  //       alert(response.data.message);
-  //       setIsLogin(true); // Switch to login page after registration
-  //     }
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //     alert(error.response?.data?.message || 'Something went wrong!');
-  //   }
-  // };
   const handleSubmit = async (e) => {
         e.preventDefault();
       
-        // try {
-        //   if (forgotPassword) {
-        //     console.log("Resetting password for", emailForReset);
-        //     const response = await axios.post('http://localhost:5000/api/reset-password', { email: emailForReset });
-        //     alert(response.data.message);
-        //   } else if (isLogin) {
-        //     const response = await axios.post('http://localhost:5000/api/login', loginData);
-        //     alert(response.data.message);
-        //     // Redirect or perform other actions after login success
-        //   } else {
-        //     const response = await axios.post('http://localhost:5000/api/register', formData);
-        //     alert(response.data.message);
-        //     setIsLogin(true); // Switch to login section
-        //   }
-        // } catch (error) {
-        //   console.error('Error:', error.response?.data?.message);
-        //   alert(error.response?.data?.message || 'Something went wrong');
-        // }
-        
-        // try {
-        //   if (forgotPassword) {
-        //     console.log("Resetting password for", emailForReset);
-        //     const response = await axios.post('http://localhost:5000/api/reset-password', { email: emailForReset });
-        //     alert(response.data.message || 'Password reset link has been sent to your email.');
-        //   } else if (isLogin) {
-        //     const response = await axios.post('http://localhost:5000/api/login', loginData);
-        //     alert(response.data.message || 'Login successful!');
-        //     // Redirect or perform other actions after login success
-        //   } else {
-        //     const response = await axios.post('http://localhost:5000/api/register', formData);
-        //     alert(response.data.message || 'Registration successful!');
-        //     setIsLogin(true); // Switch to login section
-        //   }
-        // } catch (error) {
-        //   if (error.response) {
-        //     // Server responded with a status outside the 2xx range
-        //     console.error('Response Error:', error.response.data);
-        //     alert(error.response.data.message || 'Something went wrong!');
-        //   } else if (error.request) {
-        //     // Request was made but no response was received
-        //     console.error('Request Error:', error.request);
-        //     alert('No response from server. Please try again later.');
-        //   } else {
-        //     // Something else went wrong
-        //     console.error('Unexpected Error:', error.message);
-        //     alert('An unexpected error occurred. Please try again.');
-        //   }
-        // }
-        // / Password and Confirm Password validation
   if (formData.password !== formData.confirmPassword) {
     alert("Passwords do not match!");
     return;
@@ -186,7 +87,10 @@ const RegistrationPage = () => {
             const response = await axios.post('http://localhost:5000/api/forgot-password', { email: emailForReset });
             alert(response.data.message || 'Password reset link has been sent to your email.');
           } else if (isLogin) {
-            const response = await axios.post('http://localhost:5000/api/login', loginData);
+            // const response = await axios.post('http://localhost:5000/api/login', loginData);
+            // const response = await axios.post('http://localhost:5000/user/login', loginData);
+            const response = await axios.post('http://localhost:5000/login', loginData);
+
             alert(response.data.message || 'Login successful!');
             navigate('/dashboard');
             // Redirect or perform other actions after login success
@@ -196,7 +100,7 @@ const RegistrationPage = () => {
             setIsLogin(true); // Switch to login section
           }
         } catch (error) {
-              console.error('Error:', error);
+              // console.error('Error:', error);
               alert(error.response?.data?.message || 'Something went wrong!');
             }
         
@@ -236,7 +140,7 @@ const RegistrationPage = () => {
             </>
           ) : isLogin ? (
             <>
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label className="form-label d-block text-start">Username</label>
                 <input
                   type="text"
@@ -246,7 +150,17 @@ const RegistrationPage = () => {
                   onChange={handleChange}
                   required
                 />
-              </div>
+              </div> */}
+              <label className="form-label d-block text-start">Email</label>
+<input
+  type="email"
+  className="form-control"
+  name="email"
+  value={loginData.email}
+  onChange={handleChange}
+  required
+/>
+
               <div className="mb-3">
                 <label className="form-label d-block text-start">Password</label>
                 <input

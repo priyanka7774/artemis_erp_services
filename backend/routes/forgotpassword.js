@@ -1,5 +1,5 @@
     const express = require('express');
-    const router = express.Router();
+    // const router = express.Router();
     const jwt = require('jsonwebtoken');
     const nodemailer = require('nodemailer');
     // const db = require('employee_system'); // Make sure this points to your database connection

@@ -3,9 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import AuthPage from './Components/AuthPage';
 import Vision from './Components/vision';
 import Dashboard from './Components/Dashboard';
+// import Try from "./Components/"
+import TaskUploadForm from './Components/TaskUploadForm';
+// import EmployeeTaskDashboard from './Components/EmployeeTaskDashboard';
 
-
-// import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 function App() {
@@ -22,19 +24,21 @@ function App() {
           
           <div>
             <Link to="/" className="btn btn-light me-2">Home</Link>
-            {/* <Link to="/login" className="btn btn-warning me-2">Doer</Link> */}
             <Link to="/AuthPage" className="btn btn-warning me-2">Doer</Link>
             <Link to="/login" className="btn btn-info me-2">Admin</Link>
+            {/* <Link to="/try" className="btn btn-success me-2">Try</Link> */}
           </div>
         </div>
 
         <div className="container text-center mt-5">
           <Routes>
             <Route path="/" element={<h1 className='text-black text-center p-5'>Welcome to Matoshri Group</h1>} />
-            {/* <Route path="/login" element={<LoginPage />} /> */}
+            
             <Route path="/AuthPage" element={<AuthPage />} />
             <Route path="/Vision" element={<Vision />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+           <Route path="/dashboard" element={<Dashboard />} />
+            {/* <Route path="/try" element={<Try/>} />  */}
+          
           </Routes>
         </div>
       </div>  

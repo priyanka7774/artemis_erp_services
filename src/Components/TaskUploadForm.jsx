@@ -2,30 +2,28 @@
 
 
 
+
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const TaskUploadForm = () => {
-  const navigate = useNavigate();
-
     const [date, setDate] = useState("");
-    const [tasks, setTasks] = useState([{ time: "", taskEntries: [""] }]);
+    const [tasks, setTasks] = useState([{ time: "", taskList: [""] }]);
     const [taskDetails, setTaskDetails] = useState({
         description: "",
         category: "",
         priority: "Medium",
         dueDate: "",
-        repeat: "Daily"
+        repeat: "Daily",
     });
 
     const handleTaskDetailsChange = (field, value) => {
         setTaskDetails({ ...taskDetails, [field]: value });
     };
 
-    const handleTaskChange = (timeIndex, taskIndex, value) => {
+    const handleTaskChange = (index, taskIndex, value) => {
         const updatedTasks = [...tasks];
-        updatedTasks[timeIndex].taskEntries[taskIndex] = value;
+        updatedTasks[index].taskList[taskIndex] = value;
         setTasks(updatedTasks);
     };
 
@@ -35,24 +33,23 @@ const TaskUploadForm = () => {
         setTasks(updatedTasks);
     };
 
-    const addTaskEntry = (timeIndex) => {
+    const addTaskToTimeSlot = (index) => {
         const updatedTasks = [...tasks];
-        updatedTasks[timeIndex].taskEntries.push("");
+        updatedTasks[index].taskList.push("");
         setTasks(updatedTasks);
     };
 
-    const removeTaskEntry = (timeIndex, taskIndex) => {
+    const addNewTimeSlot = () => {
+        setTasks([...tasks, { time: "", taskList: [""] }]);
+    };
+
+    const removeTask = (index, taskIndex) => {
         const updatedTasks = [...tasks];
-        updatedTasks[timeIndex].taskEntries.splice(taskIndex, 1);
+        updatedTasks[index].taskList.splice(taskIndex, 1);
+        if (updatedTasks[index].taskList.length === 0) {
+            updatedTasks.splice(index, 1);
+        }
         setTasks(updatedTasks);
-    };
-
-    const addTimeSlot = () => {
-        setTasks([...tasks, { time: "", taskEntries: [""] }]);
-    };
-
-    const removeTimeSlot = (index) => {
-        setTasks(tasks.filter((_, i) => i !== index));
     };
 
     const handleSubmit = (e) => {
@@ -70,7 +67,6 @@ const TaskUploadForm = () => {
                     <input type="date" className="form-control" value={date} onChange={(e) => setDate(e.target.value)} required />
                 </div>
 
-                {/* Task Details */}
                 <div className="border p-3 mb-4 bg-light rounded">
                     <div className="row g-3">
                         <div className="col-md-6">
@@ -94,7 +90,7 @@ const TaskUploadForm = () => {
                             <input type="date" className="form-control" value={taskDetails.dueDate} onChange={(e) => handleTaskDetailsChange("dueDate", e.target.value)} required />
                         </div>
                         <div className="col-md-6">
-                            <label className="fw-bold text-black">Repeat Frequency:</label>
+                            <label className="fw-bold text-black">Repeat:</label>
                             <select className="form-control" value={taskDetails.repeat} onChange={(e) => handleTaskDetailsChange("repeat", e.target.value)}>
                                 <option value="Daily">Daily</option>
                                 <option value="Weekly">Weekly</option>
@@ -107,45 +103,41 @@ const TaskUploadForm = () => {
                     </div>
                 </div>
 
-                {tasks.map((task, timeIndex) => (
-    <div key={timeIndex} className="border p-3 mb-3 bg-light rounded">
-        {task.taskEntries.map((taskEntry, taskIndex) => (
-            <div key={taskIndex} className="row g-3 align-items-center">
-                <div className="col-md-3">
-                    <label className="fw-bold text-black">Time Slot:</label>
-                    <input type="time" className="form-control" value={task.time} onChange={(e) => handleTimeChange(timeIndex, e.target.value)} required />
-                </div>
-                <div className="col-md-6">
-                    <label className="fw-bold text-black">Task:</label>
-                    <input type="text" className="form-control" placeholder="Enter Task" value={taskEntry} onChange={(e) => handleTaskChange(timeIndex, taskIndex, e.target.value)} required />
-                </div>
-                <div className="col-md-3 d-flex align-items-end">
-                    <button type="button" className="btn btn-danger w-100" onClick={() => removeTaskEntry(timeIndex, taskIndex)}>
-                        Remove Task
-                    </button>
-                </div>
-            </div>
-        ))}
+                {tasks.map((task, index) => (
+                    <div key={index} className="border p-3 mb-3 bg-light rounded">
+                        <div className="row g-3">
+                            <div className="col-md-5">
+                                <label className="fw-bold text-black">Time Slot:</label>
+                                <input type="time" className="form-control" value={task.time} onChange={(e) => handleTimeChange(index, e.target.value)} required />
+                            </div>
+                        </div>
 
-     
-        <div className="mt-2">
-            <button type="button" className="btn btn-outline-primary" onClick={() => addTaskEntry(timeIndex)}>
-                + Add Task for This Time
-            </button>
-        </div>
-    </div>
-))}
+                        {task.taskList.map((taskName, taskIndex) => (
+                            <div key={taskIndex} className="row g-3 mt-2 align-items-center">
+                                <div className="col-md-5">
+                                    <label className="fw-bold text-black">Task:</label>
+                                    <input type="text" className="form-control" value={taskName} onChange={(e) => handleTaskChange(index, taskIndex, e.target.value)} required />
+                                </div>
+                                <div className="col-md-2">
+                                    <button type="button" className="btn btn-danger w-100" onClick={() => removeTask(index, taskIndex)}>
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
 
+                        <div className="mt-2">
+                            <button type="button" className="btn btn-outline-primary" onClick={() => addTaskToTimeSlot(index)}>
+                                + Add Another Task for this Time
+                            </button>
+                        </div>
+                    </div>
+                ))}
 
-               
-                <button type="button" className="btn btn-outline-primary me-3" onClick={addTimeSlot}>
-                    + Add Time Slot
+                <button type="button" className="btn btn-outline-success me-3" onClick={addNewTimeSlot}>
+                    + Add New Time Slot
                 </button>
-
-                <button type="submit" className="btn btn-success">Save Schedule</button>
-                <button type="button" className="btn btn-danger m-2" onClick={() => navigate("/AuthPage")}>
-                Back To Login
-            </button>
+                <button type="submit" className="btn btn-primary">Save Schedule</button>
             </form>
         </div>
     );

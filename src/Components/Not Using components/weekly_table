@@ -1,0 +1,119 @@
+import React, { useState, useEffect } from "react";
+import Weekly from "./weekly"; 
+
+const Dashboard = () => {
+  const [userName, setUserName] = useState(""); 
+  const [isLoading, setIsLoading] = useState(true); 
+  const [view, setView] = useState("dashboard"); 
+  const [tasks, setTasks] = useState([]); 
+
+  
+  useEffect(() => {
+    const storedUserName = localStorage.getItem("userName");
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+    setIsLoading(false);
+  }, []);
+
+ 
+useEffect(() => {
+  fetch("http://localhost:5000/api/get-tasks")
+    .then(response => response.json())
+    .then(data => {
+      console.log("Fetched tasks:", data); 
+      if (Array.isArray(data)) {
+        
+        const filteredData = data.filter(
+          task => !['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].includes(task.time)
+        );
+
+        setTasks(filteredData);
+      }
+    })
+    .catch(error => console.error("❌ Error fetching tasks:", error));
+}, []);
+
+
+  const affirmations = [
+    "You're doing great!",
+    "Keep up the good work!",
+    "Success is on the way!",
+    "Believe in yourself!",
+    "You're amazing!",
+  ];
+
+  
+  const randomAffirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
+
+  const handleButtonClick = (viewName) => {
+    setView(viewName);
+  };
+
+  return (
+    <div className="container mt-4">
+      {/* Welcome Section */}
+      <div id="welcome-section" className="mb-4">
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <>
+            <h2 className="text-dark">Welcome, {userName || "Guest"}!</h2>
+            <p className="text-muted">{randomAffirmation}</p>
+          </>
+        )}
+      </div>
+
+      <div className="mb-4">
+        <button className="btn btn-primary me-2" onClick={() => handleButtonClick("weekly")}>Weekly</button>
+        <button className="btn btn-primary me-2" onClick={() => handleButtonClick("monthly")}>Monthly</button>
+        <button className="btn btn-primary" onClick={() => handleButtonClick("yearly")}>Yearly</button>
+      </div>
+
+      
+      <div>
+        {view === "weekly" && <Weekly />}
+      </div>
+
+      {view === "dashboard" && (
+        <div className="mt-4">
+          <h3 className="text-dark mb-3">Task Report</h3>
+          <table className="table table-bordered table-striped table-hover">
+            <thead className="thead-dark">
+              <tr>
+                <th className="bg-primary text-dark fw-bold">Time</th>
+                <th className="bg-primary text-dark fw-bold">Monday</th>
+                <th className="bg-primary text-dark fw-bold">Tuesday</th>
+                <th className="bg-primary text-dark fw-bold">Wednesday</th>
+                <th className="bg-primary text-dark fw-bold">Thursday</th>
+                <th className="bg-primary text-dark fw-bold">Friday</th>
+                <th className="bg-primary text-dark fw-bold">Saturday</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tasks.length > 0 ? (
+                tasks.map((task, index) => (
+                  <tr key={index}>
+                    <td>{task.time}</td>
+                    <td>{task.monday || "-"}</td>
+                    <td>{task.tuesday || "-"}</td>
+                    <td>{task.wednesday || "-"}</td>
+                    <td>{task.thursday || "-"}</td>
+                    <td>{task.friday || "-"}</td>
+                    <td>{task.saturday || "-"}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center">No tasks found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Dashboard;
