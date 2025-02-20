@@ -3,11 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import AuthPage from './Components/AuthPage';
 import Vision from './Components/vision';
 import Dashboard from './Components/Dashboard';
+
 // import Try from "./Components/"
-import TaskUploadForm from './Components/TaskUploadForm';
+// import TaskUploadForm from './Components/TaskUploadForm';
 // import EmployeeTaskDashboard from './Components/EmployeeTaskDashboard';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import WeeklyTaskView from './Components/WeeklyTaskView';
 
 
 function App() {
@@ -26,7 +28,7 @@ function App() {
             <Link to="/" className="btn btn-light me-2">Home</Link>
             <Link to="/AuthPage" className="btn btn-warning me-2">Doer</Link>
             <Link to="/login" className="btn btn-info me-2">Admin</Link>
-            {/* <Link to="/try" className="btn btn-success me-2">Try</Link> */}
+            {/* <Link to="/TaskUploadForm" className="btn btn-success me-2">Try</Link> */}
           </div>
         </div>
 
@@ -37,7 +39,8 @@ function App() {
             <Route path="/AuthPage" element={<AuthPage />} />
             <Route path="/Vision" element={<Vision />} />
            <Route path="/dashboard" element={<Dashboard />} />
-            {/* <Route path="/try" element={<Try/>} />  */}
+           <Route path="/weeklytaskview" element={<WeeklyTaskView/>} />
+           
           
           </Routes>
         </div>

@@ -210,7 +210,7 @@
 // module.exports = router;
 
 const express = require('express');
-const db = require('../db'); // Use the correct database connection
+const db = require('../db'); 
 const bodyParser = require('body-parser');
 
 const router = express.Router();

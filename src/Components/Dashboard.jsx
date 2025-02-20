@@ -2,30 +2,33 @@
 
 
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 
-const TaskUploadForm = () => {
+import React, { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate } from "react-router-dom";
+
+const Dashboard = () => {
+
   const navigate = useNavigate();
 
+
     const [date, setDate] = useState("");
-    const [tasks, setTasks] = useState([{ time: "", taskEntries: [""] }]);
+    const [tasks, setTasks] = useState([{ time: "", taskList: [""] }]);
     const [taskDetails, setTaskDetails] = useState({
         description: "",
         category: "",
         priority: "Medium",
         dueDate: "",
-        repeat: "Daily"
+        repeat: "Daily",
     });
 
     const handleTaskDetailsChange = (field, value) => {
         setTaskDetails({ ...taskDetails, [field]: value });
     };
 
-    const handleTaskChange = (timeIndex, taskIndex, value) => {
+    const handleTaskChange = (index, taskIndex, value) => {
         const updatedTasks = [...tasks];
-        updatedTasks[timeIndex].taskEntries[taskIndex] = value;
+        updatedTasks[index].taskList[taskIndex] = value;
         setTasks(updatedTasks);
     };
 
@@ -35,31 +38,122 @@ const TaskUploadForm = () => {
         setTasks(updatedTasks);
     };
 
-    const addTaskEntry = (timeIndex) => {
+    const addTaskToTimeSlot = (index) => {
         const updatedTasks = [...tasks];
-        updatedTasks[timeIndex].taskEntries.push("");
+        updatedTasks[index].taskList.push("");
         setTasks(updatedTasks);
     };
 
-    const removeTaskEntry = (timeIndex, taskIndex) => {
+    const addNewTimeSlot = () => {
+        setTasks([...tasks, { time: "", taskList: [""] }]);
+    };
+
+    const removeTask = (index, taskIndex) => {
         const updatedTasks = [...tasks];
-        updatedTasks[timeIndex].taskEntries.splice(taskIndex, 1);
+        updatedTasks[index].taskList.splice(taskIndex, 1);
+        if (updatedTasks[index].taskList.length === 0) {
+            updatedTasks.splice(index, 1);
+        }
         setTasks(updatedTasks);
     };
 
-    const addTimeSlot = () => {
-        setTasks([...tasks, { time: "", taskEntries: [""] }]);
-    };
-
-    const removeTimeSlot = (index) => {
-        setTasks(tasks.filter((_, i) => i !== index));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Tasks Submitted:", { date, taskDetails, tasks });
-        alert("Tasks successfully saved!");
-    };
+    
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+        
+    //     const taskData = {
+    //         date,
+    //         taskDetails,
+    //         tasks,
+    //     };
+    
+    //     console.log("Submitting task data:", taskData);  
+    
+    //     try {
+    //         const response = await fetch("http://localhost:5000/api/saveWeeklyTasks", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify(taskData),
+    //         });
+    
+    //         console.log("Response status:", response.status); // Log the response status
+    
+    //         if (response.ok) {
+    //             console.log("Tasks saved successfully.");
+    //             alert("Tasks successfully saved!");
+    //         } else {
+    //             console.log("Error response from server:", await response.text()); // Log the error message
+    //             alert("Error saving tasks.");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error submitting tasks:", error);
+    //         alert("Error saving tasks.");
+    //     }
+    // };
+    
+    // Second approach :
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+  
+      // Convert the selected date to a JavaScript Date object
+      const selectedDate = new Date(date);
+      const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  
+      // Map days of the week to their respective abbreviations
+      const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  
+      let assignedDays = "";
+  
+      // If repeat is Daily, assign all days (Mon-Sat)
+      if (taskDetails.repeat === "Daily") {
+          assignedDays = "Mon,Tue,Wed,Thu,Fri,Sat";
+      } 
+      // If Weekly, assign the selected day only
+      else if (taskDetails.repeat === "Weekly") {
+          assignedDays = daysOfWeek[dayOfWeek]; // Assign the day of the week (e.g., 'Mon', 'Tue', etc.)
+      } 
+      // For Monthly, Yearly, etc., handle as needed
+      else {
+          assignedDays = "Custom"; 
+      }
+  
+      const taskData = {
+          date,
+          taskDetails,
+          tasks,
+          assignedDays, 
+      };
+  
+      console.log("Submitting task data:", taskData);  
+  
+      try {
+          const response = await fetch("http://localhost:5000/api/saveWeeklyTasks", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(taskData),
+          });
+  
+          console.log("Response status:", response.status);
+  
+          if (response.ok) {
+              console.log("Tasks saved successfully.");
+              alert("Tasks successfully saved!");
+              navigate("/WeeklyTaskView");
+          } else {
+              console.log("Error response from server:", await response.text());
+              alert("Error saving tasks.");
+          }
+      } catch (error) {
+          console.error("Error submitting tasks:", error);
+          alert("Error saving tasks.");
+      }
+  };
+  
+    
 
     return (
         <div className="container mt-4 p-4 shadow-lg rounded bg-white">
@@ -70,7 +164,6 @@ const TaskUploadForm = () => {
                     <input type="date" className="form-control" value={date} onChange={(e) => setDate(e.target.value)} required />
                 </div>
 
-                {/* Task Details */}
                 <div className="border p-3 mb-4 bg-light rounded">
                     <div className="row g-3">
                         <div className="col-md-6">
@@ -94,7 +187,7 @@ const TaskUploadForm = () => {
                             <input type="date" className="form-control" value={taskDetails.dueDate} onChange={(e) => handleTaskDetailsChange("dueDate", e.target.value)} required />
                         </div>
                         <div className="col-md-6">
-                            <label className="fw-bold text-black">Repeat Frequency:</label>
+                            <label className="fw-bold text-black">Repeat:</label>
                             <select className="form-control" value={taskDetails.repeat} onChange={(e) => handleTaskDetailsChange("repeat", e.target.value)}>
                                 <option value="Daily">Daily</option>
                                 <option value="Weekly">Weekly</option>
@@ -107,48 +200,44 @@ const TaskUploadForm = () => {
                     </div>
                 </div>
 
-                {tasks.map((task, timeIndex) => (
-    <div key={timeIndex} className="border p-3 mb-3 bg-light rounded">
-        {task.taskEntries.map((taskEntry, taskIndex) => (
-            <div key={taskIndex} className="row g-3 align-items-center">
-                <div className="col-md-3">
-                    <label className="fw-bold text-black">Time Slot:</label>
-                    <input type="time" className="form-control" value={task.time} onChange={(e) => handleTimeChange(timeIndex, e.target.value)} required />
-                </div>
-                <div className="col-md-6">
-                    <label className="fw-bold text-black">Task:</label>
-                    <input type="text" className="form-control" placeholder="Enter Task" value={taskEntry} onChange={(e) => handleTaskChange(timeIndex, taskIndex, e.target.value)} required />
-                </div>
-                <div className="col-md-3 d-flex align-items-end">
-                    <button type="button" className="btn btn-danger w-100" onClick={() => removeTaskEntry(timeIndex, taskIndex)}>
-                        Remove Task
-                    </button>
-                </div>
-            </div>
-        ))}
+                {tasks.map((task, index) => (
+                    <div key={index} className="border p-3 mb-3 bg-light rounded">
+                        <div className="row g-3">
+                            <div className="col-md-5">
+                                <label className="fw-bold text-black">Time Slot:</label>
+                                <input type="time" className="form-control" value={task.time} onChange={(e) => handleTimeChange(index, e.target.value)} required />
+                            </div>
+                        </div>
 
-     
-        <div className="mt-2">
-            <button type="button" className="btn btn-outline-primary" onClick={() => addTaskEntry(timeIndex)}>
-                + Add Task for This Time
-            </button>
-        </div>
-    </div>
-))}
+                        {task.taskList.map((taskName, taskIndex) => (
+                            <div key={taskIndex} className="row g-3 mt-2 align-items-center">
+                                <div className="col-md-5">
+                                    <label className="fw-bold text-black">Task:</label>
+                                    <input type="text" className="form-control" value={taskName} onChange={(e) => handleTaskChange(index, taskIndex, e.target.value)} required />
+                                </div>
+                                <div className="col-md-2">
+                                    <button type="button" className="btn btn-danger w-100" onClick={() => removeTask(index, taskIndex)}>
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
 
+                        <div className="mt-2">
+                            <button type="button" className="btn btn-outline-primary" onClick={() => addTaskToTimeSlot(index)}>
+                                + Add Another Task for this Time
+                            </button>
+                        </div>
+                    </div>
+                ))}
 
-               
-                <button type="button" className="btn btn-outline-primary me-3" onClick={addTimeSlot}>
-                    + Add Time Slot
+                <button type="button" className="btn btn-outline-success me-3" onClick={addNewTimeSlot}>
+                    + Add New Time Slot
                 </button>
-
-                <button type="submit" className="btn btn-success">Save Schedule</button>
-                <button type="button" className="btn btn-danger m-2" onClick={() => navigate("/AuthPage")}>
-                Back To Login
-            </button>
+                <button type="submit" className="btn btn-primary">Save Schedule</button>
             </form>
         </div>
     );
 };
 
-export default TaskUploadForm;
+export default Dashboard;
